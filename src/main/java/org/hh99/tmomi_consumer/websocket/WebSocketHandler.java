@@ -1,8 +1,15 @@
 package org.hh99.tmomi_consumer.websocket;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.util.Collections;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -27,15 +34,34 @@ public class WebSocketHandler extends TextWebSocketHandler {
 	@Override
 	protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
 		System.out.println(message.getPayload());
-		String id = session.getId();  //메시지를 보낸 아이디
-		CLIENTS.entrySet().forEach(arg -> {
-			if (!arg.getKey().equals(id)) {  //같은 아이디가 아니면 메시지를 전달합니다.
-				try {
-					arg.getValue().sendMessage(message);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		});
+
+		Properties props = new Properties();
+		props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+		props.put(ConsumerConfig.GROUP_ID_CONFIG, "dynamic-group");
+		props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+		props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+
+		KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
+		consumer.subscribe(Collections.singleton("reservationEventTimeId" + message.getPayload()));
+
+		while (true) {
+			ConsumerRecords<String, String> record = consumer.poll(Duration.ofMillis(100));
+			record.forEach(r -> {
+				System.out.println("Received message from " + r.topic() + ": " + r.value());
+				// 메시지 처리 로직을 여기에 추가
+
+				String id = session.getId();  //메시지를 보낸 아이디
+				CLIENTS.entrySet().forEach(arg -> {
+					if (!arg.getKey().equals(id)) {  //같은 아이디가 아니면 메시지를 전달합니다.
+						try {
+							arg.getValue()
+								.sendMessage(new TextMessage("Received message from " + r.topic() + ": " + r.value()));
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+				});
+			});
+		}
 	}
 }

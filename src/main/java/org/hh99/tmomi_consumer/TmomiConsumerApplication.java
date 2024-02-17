@@ -11,9 +11,4 @@ public class TmomiConsumerApplication {
 		SpringApplication.run(TmomiConsumerApplication.class, args);
 	}
 
-	@KafkaListener(id = "Consumer3", topics = "Topic2", groupId = "1")
-	public void listen(String in) {
-		System.out.println(in);
-	}
-
 }

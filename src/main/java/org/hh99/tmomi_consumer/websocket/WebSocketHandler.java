@@ -37,7 +37,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
 		Properties props = new Properties();
 		props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-		props.put(ConsumerConfig.GROUP_ID_CONFIG, "dynamic-group");
+		props.put(ConsumerConfig.GROUP_ID_CONFIG, "eventTimeId" + message.getPayload());
 		props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
 		props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
 
@@ -55,17 +55,20 @@ public class WebSocketHandler extends TextWebSocketHandler {
 					2. 남은 좌석을 보여주고 CLIENTS.remove(session.getId());로 연결을 끊음
 				 */
 				
-				String id = session.getId();  //메시지를 보낸 아이디
 				CLIENTS.entrySet().forEach(arg -> {
-					if (!arg.getKey().equals(id)) {  //같은 아이디가 아니면 메시지를 전달합니다.
-						try {
-							arg.getValue()
-								.sendMessage(new TextMessage(
-									"Received message from " + r.topic() + ": " + r.value() + " :" + r.offset()));
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
+
+					// if (!arg.getKey().equals(id)) {  //같은 아이디가 아니면 메시지를 전달합니다.
+					if (!r.topic().equals("reservationEventTimeId" + message.getPayload()))
+						return;
+
+					try {
+						arg.getValue()
+							.sendMessage(new TextMessage(
+								"Received message from " + r.topic() + ": " + r.value() + " :" + r.offset()));
+					} catch (IOException e) {
+						e.printStackTrace();
 					}
+					// }
 				});
 			});
 		}

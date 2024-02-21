@@ -30,19 +30,20 @@ public class EmitterService {
 	public void listen(ReservationDto reservationDto) {
 		Map<String, SseEmitter> sseEmitters = emitterRepository.findAllEmitterStartWithById(reservationDto.getEmail());
 
-		// Redis에서 조회
-		List<ReservationResponseDto> seatList = reservationRepository.findAllByEventTimesIdAndStatus(
-				reservationDto.getEventTimeId(),
-				Status.NONE).stream()
-			.map(ReservationResponseDto::new).toList();
-
 		sseEmitters.forEach(
 			(key, emitter) -> {
+				// Redis에서 조회
+				List<ReservationResponseDto> seatList = reservationRepository.findAllByEventTimesIdAndStatus(
+						reservationDto.getEventTimeId(),
+						Status.NONE).stream()
+					.map(ReservationResponseDto::new).toList();
+				
 				emitterRepository.saveEventCache(key, reservationDto);
 				sendToClient(emitter, key, seatList);
 				emitter.complete();
 			}
 		);
+
 	}
 
 	private void sendToClient(SseEmitter emitter, String emitterId, Object data) {

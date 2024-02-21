@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.hh99.tmomi_consumer.reservation.dto.ReservationDto;
+import org.hh99.reservation.dto.ReservationDto;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
@@ -24,7 +24,7 @@ public class KafkaConfig {
 		config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 
 		JsonDeserializer<ReservationDto> deserializer = new JsonDeserializer<>(ReservationDto.class);
-		deserializer.addTrustedPackages("org.hh99.tmomi_consumer.domain.reservation.dto");
+		deserializer.addTrustedPackages("org.hh99.reservation.dto");
 
 		return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), deserializer);
 	}

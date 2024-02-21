@@ -1,4 +1,4 @@
-package org.hh99.tmomi_consumer.reservation.dto;
+package org.hh99.reservation.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

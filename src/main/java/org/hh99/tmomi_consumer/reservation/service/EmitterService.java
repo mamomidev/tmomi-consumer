@@ -22,7 +22,7 @@ public class EmitterService {
 
 	public static final Long DEFAULT_TIMEOUT = 3600L * 1000;
 
-	@KafkaListener(topics = "comment-notifications", groupId = "group_1")
+	@KafkaListener(topics = "reservation", groupId = "group_1")
 	public void listen(ReservationDto reservationDto) {
 		Map<String, SseEmitter> sseEmitters = emitterRepository.findAllEmitterStartWithById(reservationDto.getEmail());
 		sseEmitters.forEach(

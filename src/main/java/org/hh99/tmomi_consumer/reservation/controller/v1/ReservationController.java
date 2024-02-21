@@ -1,7 +1,7 @@
 package org.hh99.tmomi_consumer.reservation.controller.v1;
 
-import org.hh99.tmomi_producer.domain.reservation.dto.ReservationDto;
-import org.hh99.tmomi_producer.domain.reservation.service.ReservationService;
+import org.hh99.tmomi_consumer.reservation.dto.ReservationDto;
+import org.hh99.tmomi_consumer.reservation.service.ReservationService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

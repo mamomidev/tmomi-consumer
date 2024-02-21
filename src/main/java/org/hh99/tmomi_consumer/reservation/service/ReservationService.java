@@ -1,6 +1,6 @@
 package org.hh99.tmomi_consumer.reservation.service;
 
-import org.hh99.tmomi_producer.domain.reservation.dto.ReservationDto;
+import org.hh99.tmomi_consumer.reservation.dto.ReservationDto;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 

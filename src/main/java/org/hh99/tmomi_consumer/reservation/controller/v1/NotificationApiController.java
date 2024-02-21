@@ -18,10 +18,11 @@ public class NotificationApiController {
 
 	private final EmitterService emitterService;
 
-	@GetMapping(value = "/api/sse-connection", produces = "text/event-stream")
+	@GetMapping(value = "/api/v1/sse-connection", produces = "text/event-stream")
 	public SseEmitter stream(
-		@RequestHeader(value = "Last-Event-ID", required = false, defaultValue = "") String lastEventId) throws
+		@RequestHeader(value = "Last-Event-Id", required = false, defaultValue = "") String lastEventId,
+		@RequestHeader(value = "Event-Time-Id", required = false, defaultValue = "") Long eventTimeId) throws
 		IOException {
-		return emitterService.addEmitter("test@test.com", lastEventId);
+		return emitterService.addEmitter("test@test.com", lastEventId, eventTimeId);
 	}
 }

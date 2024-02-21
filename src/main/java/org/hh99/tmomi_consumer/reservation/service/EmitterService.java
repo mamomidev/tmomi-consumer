@@ -1,9 +1,13 @@
 package org.hh99.tmomi_consumer.reservation.service;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import org.hh99.reservation.dto.ReservationDto;
+import org.hh99.tmomi.domain.reservation.Status;
+import org.hh99.tmomi.domain.reservation.dto.ReservationResponseDto;
+import org.hh99.tmomi.domain.reservation.respository.ReservationRepository;
 import org.hh99.tmomi_consumer.reservation.Repository.EmitterRepository;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -18,16 +22,25 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class EmitterService {
 	private final EmitterRepository emitterRepository;
+	private final ReservationRepository reservationRepository;
 
 	public static final Long DEFAULT_TIMEOUT = 3600L * 1000;
 
 	@KafkaListener(topics = "reservation", groupId = "group_1")
 	public void listen(ReservationDto reservationDto) {
 		Map<String, SseEmitter> sseEmitters = emitterRepository.findAllEmitterStartWithById(reservationDto.getEmail());
+
+		// Redis에서 조회
+		List<ReservationResponseDto> seatList = reservationRepository.findAllByEventTimesIdAndStatus(
+				reservationDto.getEventTimeId(),
+				Status.NONE).stream()
+			.map(ReservationResponseDto::new).toList();
+
 		sseEmitters.forEach(
 			(key, emitter) -> {
 				emitterRepository.saveEventCache(key, reservationDto);
-				sendToClient(emitter, key, reservationDto);
+				sendToClient(emitter, key, seatList);
+				emitter.complete();
 			}
 		);
 	}
@@ -44,7 +57,7 @@ public class EmitterService {
 		}
 	}
 
-	public SseEmitter addEmitter(String userId, String lastEventId) {
+	public SseEmitter addEmitter(String userId, String lastEventId, Long evnetTimeId) {
 		String emitterId = userId + "_" + System.currentTimeMillis();
 		SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(DEFAULT_TIMEOUT));
 		log.info("emitterId : {} 사용자 emitter 연결 ", emitterId);
@@ -53,6 +66,7 @@ public class EmitterService {
 			log.info("onCompletion callback");
 			emitterRepository.deleteById(emitterId);
 		});
+
 		emitter.onTimeout(() -> {
 			log.info("onTimeout callback");
 			emitterRepository.deleteById(emitterId);

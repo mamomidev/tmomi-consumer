@@ -17,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 public class EmitterService {
-	private final ReservationService reservationService;
 	private final EmitterRepository emitterRepository;
 
 	public static final Long DEFAULT_TIMEOUT = 3600L * 1000;

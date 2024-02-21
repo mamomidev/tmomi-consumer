@@ -26,9 +26,7 @@ public class KafkaConfig {
 		JsonDeserializer<ReservationDto> deserializer = new JsonDeserializer<>(ReservationDto.class);
 		deserializer.addTrustedPackages("org.hh99.tmomi_consumer.reservation.dto");
 
-		return new DefaultKafkaConsumerFactory<>(config,
-			new StringDeserializer(),
-			deserializer);
+		return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), deserializer);
 	}
 
 	@Bean

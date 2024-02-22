@@ -8,6 +8,7 @@ import org.hh99.reservation.dto.ReservationDto;
 import org.hh99.tmomi.domain.reservation.Status;
 import org.hh99.tmomi.domain.reservation.dto.ReservationResponseDto;
 import org.hh99.tmomi.domain.reservation.respository.ReservationRepository;
+import org.hh99.tmomi.global.elasticsearch.document.ElasticSearchReservation;
 import org.hh99.tmomi.global.elasticsearch.repository.ElasticSearchReservationRepository;
 import org.hh99.tmomi_consumer.reservation.Repository.EmitterRepository;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -34,13 +35,16 @@ public class EmitterService {
 
 		sseEmitters.forEach(
 			(key, emitter) -> {
+				List<ElasticSearchReservation> elasticSeatList = elasticSearchReservationRepository.findByEventTimesId(
+					reservationDto.getEventTimeId());
+				
 				List<ReservationResponseDto> seatList = reservationRepository.findAllByEventTimesIdAndStatus(
 						reservationDto.getEventTimeId(),
 						Status.NONE).stream()
 					.map(ReservationResponseDto::new).toList();
 
 				emitterRepository.saveEventCache(key, reservationDto);
-				sendToClient(emitter, key, seatList);
+				sendToClient(emitter, key, elasticSeatList);
 				emitter.complete();
 			}
 		);

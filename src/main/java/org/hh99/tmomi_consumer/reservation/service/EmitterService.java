@@ -8,6 +8,7 @@ import org.hh99.reservation.dto.ReservationDto;
 import org.hh99.tmomi.domain.reservation.Status;
 import org.hh99.tmomi.domain.reservation.dto.ReservationResponseDto;
 import org.hh99.tmomi.domain.reservation.respository.ReservationRepository;
+import org.hh99.tmomi.global.elasticsearch.repository.ElasticSearchReservationRepository;
 import org.hh99.tmomi_consumer.reservation.Repository.EmitterRepository;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -23,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 public class EmitterService {
 	private final EmitterRepository emitterRepository;
 	private final ReservationRepository reservationRepository;
+	private final ElasticSearchReservationRepository elasticSearchReservationRepository;
 
 	public static final Long DEFAULT_TIMEOUT = 3600L * 1000;
 
@@ -32,12 +34,11 @@ public class EmitterService {
 
 		sseEmitters.forEach(
 			(key, emitter) -> {
-				// Redis에서 조회
 				List<ReservationResponseDto> seatList = reservationRepository.findAllByEventTimesIdAndStatus(
 						reservationDto.getEventTimeId(),
 						Status.NONE).stream()
 					.map(ReservationResponseDto::new).toList();
-				
+
 				emitterRepository.saveEventCache(key, reservationDto);
 				sendToClient(emitter, key, seatList);
 				emitter.complete();

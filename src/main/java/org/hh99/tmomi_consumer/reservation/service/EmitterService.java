@@ -24,7 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class EmitterService {
 	private final EmitterRepository emitterRepository;
-	private final ReservationRepository reservationRepository;
 	private final ElasticSearchReservationRepository elasticSearchReservationRepository;
 
 	public static final Long DEFAULT_TIMEOUT = 3600L * 1000;
@@ -35,8 +34,8 @@ public class EmitterService {
 
 		sseEmitters.forEach(
 			(key, emitter) -> {
-				List<ElasticSearchReservation> elasticSeatList = elasticSearchReservationRepository.findByEventTimesId(
-					reservationDto.getEventTimeId());
+				List<ElasticSearchReservation> elasticSeatList = elasticSearchReservationRepository.findAllByEventTimesIdAndStatus(
+					reservationDto.getEventTimeId(), Status.NONE);
 
 				emitterRepository.saveEventCache(key, reservationDto);
 				sendToClient(emitter, key, elasticSeatList);

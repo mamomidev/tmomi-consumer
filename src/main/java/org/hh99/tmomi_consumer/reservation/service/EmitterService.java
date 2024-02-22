@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.hh99.reservation.dto.ReservationDto;
 import org.hh99.tmomi.domain.reservation.Status;
+import org.hh99.tmomi.domain.reservation.dto.ReservationResponseDto;
 import org.hh99.tmomi.domain.reservation.respository.ReservationRepository;
 import org.hh99.tmomi.global.elasticsearch.document.ElasticSearchReservation;
 import org.hh99.tmomi.global.elasticsearch.repository.ElasticSearchReservationRepository;
@@ -34,9 +35,8 @@ public class EmitterService {
 
 		sseEmitters.forEach(
 			(key, emitter) -> {
-				List<ElasticSearchReservation> elasticSeatList = elasticSearchReservationRepository.findByEventTimesIdAndStatus(
-					reservationDto.getEventTimeId(),
-					Status.NONE);
+				List<ElasticSearchReservation> elasticSeatList = elasticSearchReservationRepository.findByEventTimesId(
+					reservationDto.getEventTimeId());
 
 				emitterRepository.saveEventCache(key, reservationDto);
 				sendToClient(emitter, key, elasticSeatList);

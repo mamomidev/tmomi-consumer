@@ -35,9 +35,9 @@ public class EmitterService {
 
 		sseEmitters.forEach(
 			(key, emitter) -> {
-				List<ElasticSearchReservation> elasticSeatList = elasticSearchReservationRepository.findByEventTimesId(
-					reservationDto.getEventTimeId());
-				
+				List<ElasticSearchReservation> elasticSeatList = elasticSearchReservationRepository.findAllByEventTimesIdAndStatus(
+					reservationDto.getEventTimeId(), Status.NONE);
+
 				List<ReservationResponseDto> seatList = reservationRepository.findAllByEventTimesIdAndStatus(
 						reservationDto.getEventTimeId(),
 						Status.NONE).stream()

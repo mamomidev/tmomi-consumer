@@ -6,8 +6,6 @@ import java.util.Map;
 
 import org.hh99.reservation.dto.ReservationDto;
 import org.hh99.tmomi.domain.reservation.Status;
-import org.hh99.tmomi.domain.reservation.dto.ReservationResponseDto;
-import org.hh99.tmomi.domain.reservation.respository.ReservationRepository;
 import org.hh99.tmomi.global.elasticsearch.document.ElasticSearchReservation;
 import org.hh99.tmomi.global.elasticsearch.repository.ElasticSearchReservationRepository;
 import org.hh99.tmomi_consumer.reservation.Repository.EmitterRepository;
@@ -25,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 public class EmitterService {
 	private final EmitterRepository emitterRepository;
 	private final ElasticSearchReservationRepository elasticSearchReservationRepository;
-
 	public static final Long DEFAULT_TIMEOUT = 3600L * 1000;
 
 	@KafkaListener(topics = "reservation", groupId = "group_1")

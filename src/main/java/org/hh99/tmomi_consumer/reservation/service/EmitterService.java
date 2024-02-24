@@ -8,6 +8,7 @@ import org.hh99.reservation.dto.ReservationDto;
 import org.hh99.tmomi.domain.reservation.Status;
 import org.hh99.tmomi.global.elasticsearch.document.ElasticSearchReservation;
 import org.hh99.tmomi.global.elasticsearch.repository.ElasticSearchReservationRepository;
+import org.hh99.tmomi_consumer.global.util.ReservationQueue;
 import org.hh99.tmomi_consumer.reservation.Repository.EmitterRepository;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -23,12 +24,15 @@ import lombok.extern.slf4j.Slf4j;
 public class EmitterService {
 	private final EmitterRepository emitterRepository;
 	private final ElasticSearchReservationRepository elasticSearchReservationRepository;
+	private final ReservationQueue reservationQueue;
 	public static final Long DEFAULT_TIMEOUT = 3600L * 1000;
 
 	@KafkaListener(topics = "reservation", groupId = "group_1")
 	public void listen(ReservationDto reservationDto) {
 		Map<String, SseEmitter> sseEmitters = emitterRepository.findAllEmitterStartWithById(reservationDto.getEmail());
 
+		reservationQueue.addQueue(reservationDto);
+		reservationQueue.getRank();
 		sseEmitters.forEach(
 			(key, emitter) -> {
 				List<ElasticSearchReservation> elasticSeatList = elasticSearchReservationRepository.findAllByEventTimesIdAndStatus(

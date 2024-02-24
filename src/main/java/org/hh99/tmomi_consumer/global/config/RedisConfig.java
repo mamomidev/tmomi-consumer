@@ -1,4 +1,4 @@
-package org.hh99.tmomi_consumer.global;
+package org.hh99.tmomi_consumer.global.config;
 
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;

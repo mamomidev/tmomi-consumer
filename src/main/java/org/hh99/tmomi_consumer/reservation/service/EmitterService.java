@@ -58,7 +58,7 @@ public class EmitterService {
 		}
 	}
 
-	public SseEmitter addEmitter(String userId, String lastEventId, Long evnetTimeId) {
+	public SseEmitter addEmitter(String userId, String lastEventId, Long eventTimeId) {
 		String emitterId = userId + "_" + System.currentTimeMillis();
 		SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(DEFAULT_TIMEOUT));
 		log.info("emitterId : {} 사용자 emitter 연결 ", emitterId);

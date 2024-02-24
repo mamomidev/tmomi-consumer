@@ -11,7 +11,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class ReservationQueue {
 
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, ReservationDto> redisTemplate;
     final String key = "reservation";
 
     // 대기열 진입
@@ -20,26 +20,14 @@ public class ReservationQueue {
         redisTemplate.opsForZSet().add(key, reservationDto, now);
     }
 
-    // 내 대기 순서 반환 or 입장 처리
-    public Long getRank() {
-        Long size = redisTemplate.opsForZSet().zCard(key); // 대기 인원
-        if (size == null) {
-            // 바로 입장?
-            return null;
-        }
-        Set<Object> queue =  redisTemplate.opsForZSet().range(key, 0, size);
+    // 입장 처리
+    public Set<ReservationDto> enter() {
+        Set<ReservationDto> queue =  redisTemplate.opsForZSet().range(key, 0, 50);
+        if(queue == null)  throw new IllegalArgumentException("입장 시킬 인원없음");
 
-        if(queue == null) {
-            // 바로 입장...?
-            return null;
-        }
-        queue.parallelStream().forEach(System.out::println
-
-        );
-
-        return null;
+        return queue;
     }
 
-    // 대기 순서 50위 미만이면 좌석 반환, 아니면 내 대기 순서 반환
+    // 대기 순서 반환
 
 }

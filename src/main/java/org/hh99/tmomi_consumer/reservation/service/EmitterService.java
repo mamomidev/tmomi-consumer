@@ -29,21 +29,21 @@ public class EmitterService {
 
 	@KafkaListener(topics = "reservation", groupId = "group_1")
 	public void listen(ReservationDto reservationDto) {
-		Map<String, SseEmitter> sseEmitters = emitterRepository.findAllEmitterStartWithById(reservationDto.getEmail());
-
 		reservationQueue.addQueue(reservationDto);
-		reservationQueue.getRank();
+	}
+
+	public void sendToSeatList(ReservationDto reservationDto) {
+		Map<String, SseEmitter> sseEmitters = emitterRepository.findAllEmitterStartWithById(reservationDto.getEmail());
 		sseEmitters.forEach(
-			(key, emitter) -> {
-				List<ElasticSearchReservation> elasticSeatList = elasticSearchReservationRepository.findAllByEventTimesIdAndStatus(
-					reservationDto.getEventTimeId(), Status.NONE);
+				(key, emitter) -> {
+					List<ElasticSearchReservation> elasticSeatList = elasticSearchReservationRepository.findAllByEventTimesIdAndStatus(
+							reservationDto.getEventTimeId(), Status.NONE);
 
-				emitterRepository.saveEventCache(key, reservationDto);
-				sendToClient(emitter, key, elasticSeatList);
-				emitter.complete();
-			}
+					emitterRepository.saveEventCache(key, reservationDto);
+					sendToClient(emitter, key, elasticSeatList);
+					emitter.complete();
+				}
 		);
-
 	}
 
 	private void sendToClient(SseEmitter emitter, String emitterId, Object data) {

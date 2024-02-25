@@ -57,7 +57,6 @@ public class EmitterService {
 		);
 	}
 
-
 	private void sendToClient(SseEmitter emitter, String emitterId, Object data) {
 		try {
 			emitter.send(SseEmitter.event()

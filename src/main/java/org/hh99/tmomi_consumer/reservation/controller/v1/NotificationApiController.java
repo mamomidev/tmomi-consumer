@@ -22,9 +22,11 @@ public class NotificationApiController {
 
 	@GetMapping(value = "/api/v1/sse-connection", produces = "text/event-stream")
 	public SseEmitter stream(
-		@RequestBody String email,
+		Authentication authentication,
 		@RequestHeader(value = "Last-Event-Id", required = false, defaultValue = "") String lastEventId,
 		@RequestHeader(value = "Event-Time-Id", required = false, defaultValue = "") Long eventTimeId) {
+		String email = authentication.getName();
+
 		return emitterService.addEmitter(email, lastEventId, eventTimeId);
 	}
 }

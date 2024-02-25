@@ -24,7 +24,7 @@ public class NotificationApiController {
 	public SseEmitter stream(
 		@RequestBody String email,
 		@RequestHeader(value = "Last-Event-Id", required = false, defaultValue = "") String lastEventId,
-		@RequestHeader(value = "Event-Time-Id", required = false, defaultValue = "") Long eventTimeId) throws IOException {
+		@RequestHeader(value = "Event-Time-Id", required = false, defaultValue = "") Long eventTimeId) {
 		return emitterService.addEmitter(email, lastEventId, eventTimeId);
 	}
 }

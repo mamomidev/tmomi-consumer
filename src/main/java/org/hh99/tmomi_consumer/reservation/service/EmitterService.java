@@ -25,14 +25,14 @@ public class EmitterService {
 	private final EmitterRepository emitterRepository;
 	private final ElasticSearchReservationRepository elasticSearchReservationRepository;
 	private final ReservationQueue reservationQueue;
-	public static final Long DEFAULT_TIMEOUT = 3600L * 1000;
+	public static final Long DEFAULT_TIMEOUT = 60L * 1000;
 
 	@KafkaListener(topics = "reservation", groupId = "group_1")
 	public void listen(ReservationDto reservationDto) {
 		reservationQueue.addQueue(reservationDto);
 	}
 
-	public void sendToSeatList(ReservationDto reservationDto) {
+	public void sendSeatListToClient(ReservationDto reservationDto) {
 		Map<String, SseEmitter> sseEmitters = emitterRepository.findAllEmitterStartWithById(reservationDto.getEmail());
 		sseEmitters.forEach(
 				(key, emitter) -> {
@@ -41,10 +41,22 @@ public class EmitterService {
 
 					emitterRepository.saveEventCache(key, reservationDto);
 					sendToClient(emitter, key, elasticSeatList);
+					emitterRepository.deleteById(reservationDto.getEmail());
 					emitter.complete();
 				}
 		);
 	}
+
+	public void sendWaitNumberToClient(ReservationDto reservationDto, Long rank) {
+		Map<String, SseEmitter> sseEmitters = emitterRepository.findAllEmitterStartWithById(reservationDto.getEmail());
+		sseEmitters.forEach(
+				(key, emitter) -> {
+					emitterRepository.saveEventCache(key, reservationDto);
+					sendToClient(emitter, key, rank);
+				}
+		);
+	}
+
 
 	private void sendToClient(SseEmitter emitter, String emitterId, Object data) {
 		try {

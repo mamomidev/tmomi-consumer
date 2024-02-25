@@ -20,14 +20,21 @@ public class ReservationQueue {
         redisTemplate.opsForZSet().add(key, reservationDto, now);
     }
 
-    // 입장 처리
-    public Set<ReservationDto> enter() {
-        Set<ReservationDto> queue =  redisTemplate.opsForZSet().range(key, 0, 50);
+    // 대기열 가져오기
+    public Set<ReservationDto> getQueue(Long end) {
+        Set<ReservationDto> queue =  redisTemplate.opsForZSet().range(key, 0, end);
         if(queue == null)  throw new IllegalArgumentException("입장 시킬 인원없음");
 
         return queue;
     }
 
-    // 대기 순서 반환
+    // 대기열에서 삭제
+    public void deleteQueue(ReservationDto reservationDto) {
+        redisTemplate.opsForZSet().remove(key, reservationDto);
+    }
 
+    // 대기 순서 반환
+    public Long getRank(ReservationDto reservationDto) {
+        return redisTemplate.opsForZSet().rank(key, reservationDto);
+    }
 }

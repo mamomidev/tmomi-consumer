@@ -8,6 +8,7 @@ import org.hh99.reservation.dto.ReservationDto;
 import org.hh99.tmomi.domain.reservation.Status;
 import org.hh99.tmomi.global.elasticsearch.document.ElasticSearchReservation;
 import org.hh99.tmomi.global.elasticsearch.repository.ElasticSearchReservationRepository;
+import org.hh99.tmomi_consumer.global.util.ReservationQueue;
 import org.hh99.tmomi_consumer.reservation.Repository.EmitterRepository;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -23,23 +24,37 @@ import lombok.extern.slf4j.Slf4j;
 public class EmitterService {
 	private final EmitterRepository emitterRepository;
 	private final ElasticSearchReservationRepository elasticSearchReservationRepository;
-	public static final Long DEFAULT_TIMEOUT = 3600L * 1000;
+	private final ReservationQueue reservationQueue;
+	public static final Long DEFAULT_TIMEOUT = 60L * 1000;
 
 	@KafkaListener(topics = "reservation", groupId = "group_1")
 	public void listen(ReservationDto reservationDto) {
+		reservationQueue.addQueue(reservationDto);
+	}
+
+	public void sendSeatListToClient(ReservationDto reservationDto) {
 		Map<String, SseEmitter> sseEmitters = emitterRepository.findAllEmitterStartWithById(reservationDto.getEmail());
-
 		sseEmitters.forEach(
-			(key, emitter) -> {
-				List<ElasticSearchReservation> elasticSeatList = elasticSearchReservationRepository.findAllByEventTimesIdAndStatus(
-					reservationDto.getEventTimeId(), Status.NONE);
+				(key, emitter) -> {
+					List<ElasticSearchReservation> elasticSeatList = elasticSearchReservationRepository.findAllByEventTimesIdAndStatus(
+							reservationDto.getEventTimeId(), Status.NONE);
 
-				emitterRepository.saveEventCache(key, reservationDto);
-				sendToClient(emitter, key, elasticSeatList);
-				emitter.complete();
-			}
+					emitterRepository.saveEventCache(key, reservationDto);
+					sendToClient(emitter, key, elasticSeatList);
+					emitterRepository.deleteById(reservationDto.getEmail());
+					emitter.complete();
+				}
 		);
+	}
 
+	public void sendWaitNumberToClient(ReservationDto reservationDto, Long rank) {
+		Map<String, SseEmitter> sseEmitters = emitterRepository.findAllEmitterStartWithById(reservationDto.getEmail());
+		sseEmitters.forEach(
+				(key, emitter) -> {
+					emitterRepository.saveEventCache(key, reservationDto);
+					sendToClient(emitter, key, rank);
+				}
+		);
 	}
 
 	private void sendToClient(SseEmitter emitter, String emitterId, Object data) {
@@ -54,7 +69,7 @@ public class EmitterService {
 		}
 	}
 
-	public SseEmitter addEmitter(String userId, String lastEventId, Long evnetTimeId) {
+	public SseEmitter addEmitter(String userId, String lastEventId, Long eventTimeId) {
 		String emitterId = userId + "_" + System.currentTimeMillis();
 		SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(DEFAULT_TIMEOUT));
 		log.info("emitterId : {} 사용자 emitter 연결 ", emitterId);

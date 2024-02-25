@@ -3,7 +3,9 @@ package org.hh99.tmomi_consumer.reservation.controller.v1;
 import java.io.IOException;
 
 import org.hh99.tmomi_consumer.reservation.service.EmitterService;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -20,9 +22,9 @@ public class NotificationApiController {
 
 	@GetMapping(value = "/api/v1/sse-connection", produces = "text/event-stream")
 	public SseEmitter stream(
+		@RequestBody String email,
 		@RequestHeader(value = "Last-Event-Id", required = false, defaultValue = "") String lastEventId,
-		@RequestHeader(value = "Event-Time-Id", required = false, defaultValue = "") Long eventTimeId) throws
-		IOException {
-		return emitterService.addEmitter("test@test.com", lastEventId, eventTimeId);
+		@RequestHeader(value = "Event-Time-Id", required = false, defaultValue = "") Long eventTimeId) {
+		return emitterService.addEmitter(email, lastEventId, eventTimeId);
 	}
 }

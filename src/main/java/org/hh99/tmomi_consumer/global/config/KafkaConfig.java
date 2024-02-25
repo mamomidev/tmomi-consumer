@@ -1,4 +1,4 @@
-package org.hh99.tmomi_consumer.global;
+package org.hh99.tmomi_consumer.global.config;
 
 import java.util.HashMap;
 import java.util.Map;

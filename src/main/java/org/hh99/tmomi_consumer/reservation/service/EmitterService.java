@@ -6,8 +6,8 @@ import java.util.Map;
 
 import org.hh99.reservation.dto.ReservationDto;
 import org.hh99.tmomi.domain.reservation.Status;
-import org.hh99.tmomi.global.elasticsearch.document.ElasticSearchReservation;
-import org.hh99.tmomi.global.elasticsearch.repository.ElasticSearchReservationRepository;
+import org.hh99.tmomi.domain.reservation.document.ElasticSearchReservation;
+import org.hh99.tmomi.domain.reservation.respository.ElasticSearchReservationRepository;
 import org.hh99.tmomi_consumer.global.util.ReservationQueue;
 import org.hh99.tmomi_consumer.reservation.Repository.EmitterRepository;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -35,25 +35,25 @@ public class EmitterService {
 	public void sendSeatListToClient(ReservationDto reservationDto) {
 		Map<String, SseEmitter> sseEmitters = emitterRepository.findAllEmitterStartWithById(reservationDto.getEmail());
 		sseEmitters.forEach(
-				(key, emitter) -> {
-					List<ElasticSearchReservation> elasticSeatList = elasticSearchReservationRepository.findAllByEventTimesIdAndStatus(
-							reservationDto.getEventTimeId(), Status.NONE);
+			(key, emitter) -> {
+				List<ElasticSearchReservation> elasticSeatList = elasticSearchReservationRepository.findAllByEventTimesIdAndStatus(
+					reservationDto.getEventTimeId(), Status.NONE);
 
-					emitterRepository.saveEventCache(key, reservationDto);
-					sendToClient(emitter, key, elasticSeatList);
-					emitterRepository.deleteById(reservationDto.getEmail());
-					emitter.complete();
-				}
+				emitterRepository.saveEventCache(key, reservationDto);
+				sendToClient(emitter, key, elasticSeatList);
+				emitterRepository.deleteById(reservationDto.getEmail());
+				emitter.complete();
+			}
 		);
 	}
 
 	public void sendWaitNumberToClient(ReservationDto reservationDto, Long rank) {
 		Map<String, SseEmitter> sseEmitters = emitterRepository.findAllEmitterStartWithById(reservationDto.getEmail());
 		sseEmitters.forEach(
-				(key, emitter) -> {
-					emitterRepository.saveEventCache(key, reservationDto);
-					sendToClient(emitter, key, rank);
-				}
+			(key, emitter) -> {
+				emitterRepository.saveEventCache(key, reservationDto);
+				sendToClient(emitter, key, rank);
+			}
 		);
 	}
 
@@ -82,6 +82,11 @@ public class EmitterService {
 		emitter.onTimeout(() -> {
 			log.info("onTimeout callback");
 			emitterRepository.deleteById(emitterId);
+		});
+
+		emitter.onError((Error) -> {
+			log.info("Error callback");
+			log.error(Error.getMessage());
 		});
 
 		sendToClient(emitter, emitterId, "connected!"); // 503 에러방지 더미 데이터

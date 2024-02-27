@@ -39,8 +39,8 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-project(':tmomi_consumer') { // 컴파일 시 로딩
+project(':tmomi-consumer') { // 컴파일 시 로딩
     dependencies {
-        compileOnly project(':tmomi')
+        compileOnly project(':tmomi-web')
     }
 }

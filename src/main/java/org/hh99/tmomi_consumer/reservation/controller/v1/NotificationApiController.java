@@ -1,6 +1,9 @@
 package org.hh99.tmomi_consumer.reservation.controller.v1;
 
+import org.hh99.tmomi.global.exception.GlobalException;
+import org.hh99.tmomi.global.exception.message.ExceptionCode;
 import org.hh99.tmomi_consumer.reservation.service.EmitterService;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,11 +22,12 @@ public class NotificationApiController {
 
 	@GetMapping(value = "/api/v1/sse-connection", produces = "text/event-stream")
 	public SseEmitter stream(
-			@AuthenticationPrincipal UserDetails userDetails,
-			@RequestHeader(value = "Last-Event-Id", required = false, defaultValue = "") String lastEventId,
-			@RequestHeader(value = "Event-Time-Id", required = false, defaultValue = "") Long eventTimeId) {
+		@AuthenticationPrincipal UserDetails userDetails,
+		@RequestHeader(value = "Last-Event-Id", required = false, defaultValue = "") String lastEventId) {
+		if (userDetails == null) {
+			throw new GlobalException(HttpStatus.NOT_FOUND, ExceptionCode.NOT_EXIST_USER);
+		}
 		String email = userDetails.getUsername();
-
-		return emitterService.addEmitter(email, lastEventId, eventTimeId);
+		return emitterService.addEmitter(email, lastEventId);
 	}
 }

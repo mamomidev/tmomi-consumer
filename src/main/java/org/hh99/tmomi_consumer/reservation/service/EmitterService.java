@@ -25,7 +25,7 @@ public class EmitterService {
 	private final EmitterRepository emitterRepository;
 	private final ElasticSearchReservationRepository elasticSearchReservationRepository;
 	private final ReservationQueue reservationQueue;
-	public static final Long DEFAULT_TIMEOUT = 60L * 1000;
+	public static final Long DEFAULT_TIMEOUT = 1000L;
 
 	@KafkaListener(topics = "reservation", groupId = "group_1")
 	public void listen(ReservationDto reservationDto) {
@@ -69,7 +69,7 @@ public class EmitterService {
 		}
 	}
 
-	public SseEmitter addEmitter(String userId, String lastEventId, Long eventTimeId) {
+	public SseEmitter addEmitter(String userId, String lastEventId) {
 		String emitterId = userId + "_" + System.currentTimeMillis();
 		SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(DEFAULT_TIMEOUT));
 		log.info("emitterId : {} 사용자 emitter 연결 ", emitterId);

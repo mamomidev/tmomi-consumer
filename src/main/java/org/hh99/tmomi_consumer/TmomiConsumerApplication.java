@@ -13,10 +13,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 @EnableCaching
 @EntityScan(basePackages = {"org.hh99.tmomi"})
-@EnableJpaRepositories(basePackages = {"org.hh99.tmomi.domain.event", "org.hh99.tmomi.domain.stage",
-	"org.hh99.tmomi.domain.ticket", "org.hh99.tmomi.domain.user"})
-@EnableRedisRepositories(basePackages = "org.hh99.tmomi.global.redis")
-@EnableElasticsearchRepositories(basePackages = "org.hh99.tmomi.domain.reservation")
+@EnableRedisRepositories(basePackages = {"org.hh99.tmomi.global.redis"})
+@EnableJpaRepositories(basePackages = {"org.hh99.tmomi"})
+@EnableElasticsearchRepositories(basePackages = {"org.hh99.tmomi.domain.reservation.respository"})
 public class TmomiConsumerApplication {
 
 	public static void main(String[] args) {

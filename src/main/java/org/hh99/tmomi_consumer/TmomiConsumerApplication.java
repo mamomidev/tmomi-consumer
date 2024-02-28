@@ -15,7 +15,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EntityScan(basePackages = {"org.hh99.tmomi"})
 @EnableRedisRepositories(basePackages = {"org.hh99.tmomi.global.redis"})
 @EnableJpaRepositories(basePackages = {"org.hh99.tmomi"})
-@EnableElasticsearchRepositories(basePackages = {"org.hh99.tmomi.domain.reservation.respository"})
+@EnableElasticsearchRepositories(basePackages = "org.hh99.tmomi.domain.reservation.respository")
 public class TmomiConsumerApplication {
 
 	public static void main(String[] args) {

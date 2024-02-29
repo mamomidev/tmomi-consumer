@@ -19,6 +19,10 @@ public class KafkaConfig {
 
 	@Value(value = "${spring.kafka.bootstrap-servers}")
 	private String bootstrapAddress;
+	@Value(value = "${aws.access-key}")
+	private String awsAccessKeyId;
+	@Value(value = "${aws.secret-access-key}")
+	private String awsSecretAccessKey;
 
 	@Bean
 	public ConsumerFactory<String, ReservationDto> consumerFactory() {
@@ -26,7 +30,8 @@ public class KafkaConfig {
 		config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
 		config.put(ConsumerConfig.GROUP_ID_CONFIG, "group_1");
 		config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-
+		config.put("AWS_ACCESS_KEY_ID", awsAccessKeyId);
+		config.put("AWS_SECRET_ACCESS_KEY", awsSecretAccessKey);
 		JsonDeserializer<ReservationDto> deserializer = new JsonDeserializer<>(ReservationDto.class);
 		deserializer.addTrustedPackages("org.hh99.reservation.dto");
 

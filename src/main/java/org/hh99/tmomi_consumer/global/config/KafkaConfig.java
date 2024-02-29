@@ -38,7 +38,7 @@ public class KafkaConfig {
 
 		config.put(AdminClientConfig.SECURITY_PROTOCOL_CONFIG, "SASL_SSL");
 		config.put(SaslConfigs.SASL_MECHANISM, "AWS_MSK_IAM");
-		config.put(SaslConfigs.SASL_JAAS_CONFIG,"software.amazon.msk.auth.iam.IAMLoginModule required;");
+		config.put(SaslConfigs.SASL_JAAS_CONFIG,"software.amazon.msk.auth.iam.IAMLoginModule required awsProfileName=\"tmomi-kafka\";");
 		config.put(SaslConfigs.SASL_CLIENT_CALLBACK_HANDLER_CLASS, "software.amazon.msk.auth.iam.IAMClientCallbackHandler");
 
 		JsonDeserializer<ReservationDto> deserializer = new JsonDeserializer<>(ReservationDto.class);

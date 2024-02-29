@@ -33,8 +33,8 @@ public class KafkaConfig {
 		config.put(ConsumerConfig.GROUP_ID_CONFIG, "group_1");
 		config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 
-		config.put("AWS_ACCESS_KEY_ID", awsAccessKeyId);
-		config.put("AWS_SECRET_ACCESS_KEY", awsSecretAccessKey);
+		System.setProperty("AWS_ACCESS_KEY_ID", awsAccessKeyId);
+		System.setProperty("AWS_SECRET_ACCESS_KEY", awsSecretAccessKey);
 
 		config.put(AdminClientConfig.SECURITY_PROTOCOL_CONFIG, "SASL_SSL");
 		config.put(SaslConfigs.SASL_MECHANISM, "AWS_MSK_IAM");

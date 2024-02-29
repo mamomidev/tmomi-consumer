@@ -10,7 +10,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableScheduling
-@EnableCaching
 @EntityScan(basePackages = {"org.hh99.tmomi"})
 @EnableRedisRepositories(basePackages = {"org.hh99.tmomi.global.redis"})
 @EnableJpaRepositories(basePackages = {"org.hh99.tmomi"})

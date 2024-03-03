@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -22,12 +23,8 @@ public class NotificationApiController {
 
 	@GetMapping(value = "/api/v1/sse-connection", produces = "text/event-stream")
 	public SseEmitter stream(
-		@AuthenticationPrincipal UserDetails userDetails,
+		@RequestBody String email,
 		@RequestHeader(value = "Last-Event-Id", required = false, defaultValue = "") String lastEventId) {
-		if (userDetails == null) {
-			throw new GlobalException(HttpStatus.NOT_FOUND, ExceptionCode.NOT_EXIST_USER);
-		}
-		String email = userDetails.getUsername();
 		return emitterService.addEmitter(email, lastEventId);
 	}
 }

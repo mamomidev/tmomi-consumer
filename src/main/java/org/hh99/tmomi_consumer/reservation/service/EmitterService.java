@@ -25,7 +25,7 @@ public class EmitterService {
 	private final EmitterRepository emitterRepository;
 	private final ElasticSearchReservationRepository elasticSearchReservationRepository;
 	private final ReservationQueue reservationQueue;
-	public static final Long DEFAULT_TIMEOUT = 1000L;
+	public static final Long DEFAULT_TIMEOUT = -1L;
 
 	@KafkaListener(topics = "reservation", groupId = "group_1")
 	public void listen(ReservationDto reservationDto) {

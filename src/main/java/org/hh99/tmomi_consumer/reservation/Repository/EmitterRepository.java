@@ -18,22 +18,12 @@ public class EmitterRepository {
 		return sseEmitter;
 	}
 
-	public void saveEventCache(String emitterId, Object event) {
-		eventCache.put(emitterId, event);
-	}
-
 	public Map<String, SseEmitter> findAllEmitters() {
 		return new HashMap<>(emitters);
 	}
 
 	public Map<String, SseEmitter> findAllEmitterStartWithById(String memberId) {
 		return emitters.entrySet().stream()
-			.filter(entry -> entry.getKey().startsWith(memberId))
-			.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-	}
-
-	public Map<String, Object> findAllEventCacheStartWithById(String memberId) {
-		return eventCache.entrySet().stream()
 			.filter(entry -> entry.getKey().startsWith(memberId))
 			.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 	}

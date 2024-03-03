@@ -38,8 +38,6 @@ public class EmitterService {
 			(key, emitter) -> {
 				List<ElasticSearchReservation> elasticSeatList = elasticSearchReservationRepository.findAllByEventTimesIdAndStatus(
 					reservationDto.getEventTimeId(), Status.NONE);
-
-				emitterRepository.saveEventCache(key, reservationDto);
 				sendToClient(emitter, key, elasticSeatList);
 				emitterRepository.deleteById(reservationDto.getEmail());
 				emitter.complete();
@@ -51,7 +49,6 @@ public class EmitterService {
 		Map<String, SseEmitter> sseEmitters = emitterRepository.findAllEmitterStartWithById(reservationDto.getEmail());
 		sseEmitters.forEach(
 			(key, emitter) -> {
-				emitterRepository.saveEventCache(key, reservationDto);
 				sendToClient(emitter, key, rank);
 			}
 		);
@@ -67,7 +64,7 @@ public class EmitterService {
 		}
 	}
 
-	public SseEmitter addEmitter(String userId, String lastEventId) {
+	public SseEmitter addEmitter(String userId) {
 		String emitterId = userId + "_" + System.currentTimeMillis();
 		SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(DEFAULT_TIMEOUT));
 
@@ -81,12 +78,6 @@ public class EmitterService {
 
 		sendToClient(emitter, emitterId, "connected!"); // 503 에러방지 더미 데이터
 
-		if (!lastEventId.isEmpty()) {
-			Map<String, Object> events = emitterRepository.findAllEventCacheStartWithById(userId);
-			events.entrySet().stream()
-				.filter(entry -> lastEventId.compareTo(entry.getKey()) < 0)
-				.forEach(entry -> sendToClient(emitter, entry.getKey(), entry.getValue()));
-		}
 		return emitter;
 	}
 

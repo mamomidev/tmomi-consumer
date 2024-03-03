@@ -62,31 +62,21 @@ public class EmitterService {
 			emitter.send(SseEmitter.event()
 				.id(emitterId)
 				.data(data));
-			log.info("Kafka로 부터 전달 받은 메세지 전송. emitterId : {}, message : {}", emitterId, data);
 		} catch (IOException e) {
 			emitterRepository.deleteById(emitterId);
-			log.error("메시지 전송 에러 : {}", e);
 		}
 	}
 
 	public SseEmitter addEmitter(String userId, String lastEventId) {
 		String emitterId = userId + "_" + System.currentTimeMillis();
 		SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(DEFAULT_TIMEOUT));
-		log.info("emitterId : {} 사용자 emitter 연결 ", emitterId);
 
 		emitter.onCompletion(() -> {
-			log.info("onCompletion callback");
 			emitterRepository.deleteById(emitterId);
 		});
 
 		emitter.onTimeout(() -> {
-			log.info("onTimeout callback");
 			emitterRepository.deleteById(emitterId);
-		});
-
-		emitter.onError((Error) -> {
-			log.info("Error callback");
-			log.error(Error.getMessage());
 		});
 
 		sendToClient(emitter, emitterId, "connected!"); // 503 에러방지 더미 데이터
@@ -106,10 +96,8 @@ public class EmitterService {
 		sseEmitters.forEach((key, emitter) -> {
 			try {
 				emitter.send(SseEmitter.event().id(key).name("heartbeat").data(""));
-				log.info("하트비트 메세지 전송");
 			} catch (IOException e) {
 				emitterRepository.deleteById(key);
-				log.error("하트비트 전송 실패: {}", e.getMessage());
 			}
 		});
 	}

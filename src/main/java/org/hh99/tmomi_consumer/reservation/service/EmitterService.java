@@ -39,13 +39,12 @@ public class EmitterService {
 				List<ElasticSearchReservation> elasticSeatList = elasticSearchReservationRepository.findAllByEventTimesIdAndStatus(
 					reservationDto.getEventTimeId(), Status.NONE);
 				sendToClient(emitter, key, elasticSeatList);
-				emitterRepository.deleteById(reservationDto.getEmail());
 				emitter.complete();
 			}
 		);
 	}
 	
-	private void sendToClient(SseEmitter emitter, String emitterId, Object data) {
+	public void sendToClient(SseEmitter emitter, String emitterId, Object data) {
 		try {
 			emitter.send(SseEmitter.event()
 				.id(emitterId)
@@ -69,29 +68,5 @@ public class EmitterService {
 		sendToClient(emitter, emitterId, "connected!"); // 503 에러방지 더미 데이터
 
 		return emitter;
-	}
-
-	@Scheduled(fixedRate = 1000) // 3분마다 heartbeat 메세지 전달.
-	public void sendQueueNum() {
-		Map<String, SseEmitter> sseEmitters = emitterRepository.findAllEmitters();
-		sseEmitters.forEach((key, emitter) -> {
-			ReservationDto reservationDto = new ReservationDto(key.split("_")[0], Long.parseLong(key.split("_")[1]));
-			long rank = reservationQueue.getRank(reservationDto) + 1;
-			if (rank > 50) {
-				sendToClient(emitter, key, rank);
-			}
-		});
-	}
-
-	@Scheduled(fixedRate = 180000) // 3분마다 heartbeat 메세지 전달.
-	public void sendHeartbeat() {
-		Map<String, SseEmitter> sseEmitters = emitterRepository.findAllEmitters();
-		sseEmitters.forEach((key, emitter) -> {
-			try {
-				emitter.send(SseEmitter.event().id(key).name("heartbeat").data(""));
-			} catch (IOException e) {
-				emitterRepository.deleteById(key);
-			}
-		});
 	}
 }

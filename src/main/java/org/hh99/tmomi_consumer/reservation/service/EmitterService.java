@@ -44,16 +44,7 @@ public class EmitterService {
 			}
 		);
 	}
-
-	public void sendWaitNumberToClient(ReservationDto reservationDto, Long rank) {
-		Map<String, SseEmitter> sseEmitters = emitterRepository.findAllEmitterStartWithById(reservationDto.getEmail());
-		sseEmitters.forEach(
-			(key, emitter) -> {
-				sendToClient(emitter, key, rank);
-			}
-		);
-	}
-
+	
 	private void sendToClient(SseEmitter emitter, String emitterId, Object data) {
 		try {
 			emitter.send(SseEmitter.event()
@@ -87,7 +78,7 @@ public class EmitterService {
 			ReservationDto reservationDto = new ReservationDto(key.split("_")[0], Long.parseLong(key.split("_")[1]));
 			long rank = reservationQueue.getRank(reservationDto) + 1;
 			if (rank > 50) {
-				sendWaitNumberToClient(reservationDto, rank);
+				sendToClient(emitter, key, rank);
 			}
 		});
 	}

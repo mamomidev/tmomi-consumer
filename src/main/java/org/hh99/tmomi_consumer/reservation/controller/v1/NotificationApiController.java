@@ -1,5 +1,6 @@
 package org.hh99.tmomi_consumer.reservation.controller.v1;
 
+import org.hh99.reservation.dto.ReservationDto;
 import org.hh99.tmomi_consumer.reservation.service.EmitterService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,7 +17,7 @@ public class NotificationApiController {
 	private final EmitterService emitterService;
 
 	@GetMapping(value = "/api/v1/sse-connection", produces = "text/event-stream")
-	public SseEmitter stream(@RequestBody String email) {
-		return emitterService.addEmitter(email);
+	public SseEmitter stream(@RequestBody ReservationDto reservationDto) {
+		return emitterService.addEmitter(reservationDto);
 	}
 }

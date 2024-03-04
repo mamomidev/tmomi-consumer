@@ -64,21 +64,32 @@ public class EmitterService {
 		}
 	}
 
-	public SseEmitter addEmitter(String userId) {
-		String emitterId = userId + "_" + System.currentTimeMillis();
+	public SseEmitter addEmitter(ReservationDto reservationDto) {
+		String emitterId = reservationDto.getEmail() + "_" + reservationDto.getEventTimeId();
 		SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(DEFAULT_TIMEOUT));
 
 		emitter.onCompletion(() -> {
 			emitterRepository.deleteById(emitterId);
+			reservationQueue.deleteQueue(reservationDto);
 		});
 
-		emitter.onTimeout(() -> {
-			emitterRepository.deleteById(emitterId);
-		});
+		emitter.onTimeout(emitter::complete);
 
 		sendToClient(emitter, emitterId, "connected!"); // 503 에러방지 더미 데이터
 
 		return emitter;
+	}
+
+	@Scheduled(fixedRate = 1000) // 3분마다 heartbeat 메세지 전달.
+	public void sendQueueNum() {
+		Map<String, SseEmitter> sseEmitters = emitterRepository.findAllEmitters();
+		sseEmitters.forEach((key, emitter) -> {
+			ReservationDto reservationDto = new ReservationDto(key.split("_")[0], Long.parseLong(key.split("_")[1]));
+			long rank = reservationQueue.getRank(reservationDto) + 1;
+			if (rank > 50) {
+				sendWaitNumberToClient(reservationDto, rank);
+			}
+		});
 	}
 
 	@Scheduled(fixedRate = 180000) // 3분마다 heartbeat 메세지 전달.

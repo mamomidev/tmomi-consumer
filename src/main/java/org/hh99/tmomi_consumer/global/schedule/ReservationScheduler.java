@@ -26,14 +26,5 @@ public class ReservationScheduler {
 			emitterService.sendSeatListToClient(reservationDto);
 			reservationQueue.deleteQueue(reservationDto);
 		});
-
-		if (enterQueue.size() == joinSize) {
-			// 나머지 대기열 가져오기, 사용자에게 대기 순위 보내주기
-			Set<ReservationDto> waitQueue = reservationQueue.getQueue(-1L);
-			waitQueue.parallelStream().forEach(reservationDto -> {
-				Long rank = reservationQueue.getRank(reservationDto) + 1;
-				emitterService.sendWaitNumberToClient(reservationDto, rank);
-			});
-		}
 	}
 }

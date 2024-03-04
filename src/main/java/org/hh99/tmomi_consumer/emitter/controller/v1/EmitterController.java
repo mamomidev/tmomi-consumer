@@ -1,7 +1,7 @@
-package org.hh99.tmomi_consumer.reservation.controller.v1;
+package org.hh99.tmomi_consumer.emitter.controller.v1;
 
 import org.hh99.reservation.dto.ReservationDto;
-import org.hh99.tmomi_consumer.reservation.service.EmitterService;
+import org.hh99.tmomi_consumer.emitter.service.EmitterService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-public class NotificationApiController {
+public class EmitterController {
 	private final EmitterService emitterService;
 
 	@GetMapping(value = "/api/v1/sse-connection", produces = "text/event-stream")

@@ -1,4 +1,4 @@
-package org.hh99.tmomi_consumer.reservation.Repository;
+package org.hh99.tmomi_consumer.emitter.Repository;
 
 import java.util.HashMap;
 import java.util.Map;

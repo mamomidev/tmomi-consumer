@@ -6,8 +6,8 @@ import java.util.Set;
 
 import org.hh99.reservation.dto.ReservationDto;
 import org.hh99.tmomi_consumer.global.util.ReservationQueue;
-import org.hh99.tmomi_consumer.reservation.Repository.EmitterRepository;
-import org.hh99.tmomi_consumer.reservation.service.EmitterService;
+import org.hh99.tmomi_consumer.emitter.Repository.EmitterRepository;
+import org.hh99.tmomi_consumer.emitter.service.EmitterService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 

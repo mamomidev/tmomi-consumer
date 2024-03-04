@@ -1,4 +1,4 @@
-package org.hh99.tmomi_consumer.reservation.service;
+package org.hh99.tmomi_consumer.emitter.service;
 
 import java.io.IOException;
 import java.util.List;
@@ -9,9 +9,8 @@ import org.hh99.tmomi.domain.reservation.Status;
 import org.hh99.tmomi.domain.reservation.document.ElasticSearchReservation;
 import org.hh99.tmomi.domain.reservation.respository.ElasticSearchReservationRepository;
 import org.hh99.tmomi_consumer.global.util.ReservationQueue;
-import org.hh99.tmomi_consumer.reservation.Repository.EmitterRepository;
+import org.hh99.tmomi_consumer.emitter.Repository.EmitterRepository;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 

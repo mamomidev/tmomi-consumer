@@ -24,6 +24,5 @@ public class EmitterController {
 
 	@PostMapping("/alert-test")
 	public void alertTest() {
-		log.info("alert Test");
 	}
 }

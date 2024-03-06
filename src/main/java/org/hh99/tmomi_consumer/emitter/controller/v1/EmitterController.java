@@ -3,6 +3,7 @@ package org.hh99.tmomi_consumer.emitter.controller.v1;
 import org.hh99.reservation.dto.ReservationDto;
 import org.hh99.tmomi_consumer.emitter.service.EmitterService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -19,5 +20,10 @@ public class EmitterController {
 	@GetMapping(value = "/api/v1/sse-connection", produces = "text/event-stream")
 	public SseEmitter stream(@RequestBody ReservationDto reservationDto) {
 		return emitterService.addEmitter(reservationDto);
+	}
+
+	@PostMapping("/alert-test")
+	public void alertTest() {
+		log.info("alert Test");
 	}
 }

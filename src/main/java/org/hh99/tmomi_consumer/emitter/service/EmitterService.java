@@ -37,6 +37,7 @@ public class EmitterService {
 			(key, emitter) -> {
 				List<ElasticSearchReservation> elasticSeatList = elasticSearchReservationRepository.findAllByEventTimesIdAndStatus(
 					reservationDto.getEventTimeId(), Status.NONE);
+				sendToClient(emitter, key, "완료");
 				sendToClient(emitter, key, elasticSeatList);
 				emitter.complete();
 			}
@@ -64,7 +65,7 @@ public class EmitterService {
 
 		emitter.onTimeout(emitter::complete);
 
-		sendToClient(emitter, emitterId, "connected!"); // 503 에러방지 더미 데이터
+		sendToClient(emitter, emitterId, "대기 중"); // 503 에러방지 더미 데이터
 
 		return emitter;
 	}

@@ -7,12 +7,12 @@
         flex-direction: column;
         align-items: center;
     }
+
     /* 대기번호 창 스타일 */
     #number {
         background-color: #f9f9f9;
         border: 1px solid #ccc;
         padding: 10px;
-        margin-top: 150px;
         border-radius: 5px;
         text-align: center;
         width: 300px;
@@ -51,10 +51,13 @@
     #send:hover {
         background-color: #0056b3; /* 호버 색상 */
     }
-    .queue-title{
+
+    .queue-title {
         display: inline-block;
         margin-top: 10px;
         margin-bottom: 190px;
+        font-size: 20px;
+        font-weight: bold;
     }
 </style>
 <head>
@@ -71,8 +74,7 @@
 
 <div id="number">
     <span class="queue-title">내 대기번호</span> <br/>
-
-    <span id="queue-number">111</span>
+    <span id="queue-number"></span>
 </div>
 
 </body>
@@ -82,10 +84,12 @@
         let email = document.querySelector('#email').value;
         let eventTimeId = document.querySelector('#eventTimeId').value;
 
-        const eventSource = new EventSource(`/api/v1/sse-connection?email=${email}&eventTimeid=${eventTimeId}`);
+        const eventSource = new EventSource(`/api/v1/sse-connection?email=${email}&eventTimeId=${eventTimeId}`);
         eventSource.onmessage = function (event) {
-            console.log(event.data);
-            document.querySelector('#queue-number').innerHTML(event.data)
+            if (event.data == "완료") {
+                document.querySelector("body").innerHTML = ``;
+            }
+            document.querySelector('#queue-number').innerHTML = event.data;
         };
     });
 </script>

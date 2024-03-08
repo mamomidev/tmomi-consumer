@@ -31,14 +31,15 @@ public class Scheduler {
 			emitterService.sendSeatListToClient(reservationDto);
 			reservationQueue.deleteQueue(reservationDto);
 		});
-	}
 
-	@Scheduled(fixedRate = delay)
-	public void sendQueueNum() {
 		Map<String, SseEmitter> sseEmitters = emitterRepository.findAllEmitters();
 		sseEmitters.forEach((key, emitter) -> {
 			Long getQueueSize = reservationQueue.getSize();
-			if (getQueueSize > 0) {
+			if (getQueueSize > 50) {
+				if (key == null && emitter == null) {
+					return;
+				}
+
 				ReservationDto reservationDto = new ReservationDto(key.split("_")[0],
 					Long.parseLong(key.split("_")[1]));
 				long rank = reservationQueue.getRank(reservationDto) + 1;

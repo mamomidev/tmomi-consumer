@@ -35,8 +35,8 @@ public class EmitterService {
 		Map<String, SseEmitter> sseEmitters = emitterRepository.findAllEmitterStartWithById(reservationDto.getEmail());
 		sseEmitters.forEach(
 			(key, emitter) -> {
-				List<ElasticSearchReservation> elasticSeatList = elasticSearchReservationRepository.findAllByEventTimesIdAndStatus(
-					reservationDto.getEventTimeId(), Status.NONE);
+				List<ElasticSearchReservation> elasticSeatList = elasticSearchReservationRepository.findAllByEventTimesId(
+					reservationDto.getEventTimeId());
 				sendToClient(emitter, key, "완료");
 				sendToClient(emitter, key, elasticSeatList);
 				emitter.complete();

@@ -59,40 +59,75 @@
         font-size: 20px;
         font-weight: bold;
     }
+    .num {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 1px solid #000;
+        margin: 3px;
+        color: #fff;
+        font-size: 14px;
+        line-height: 20px;
+        text-align: center;
+    }
+    .yes {
+        cursor: pointer;
+        background-color: #007bff;
+        border: 1px solid #007bff;
+    }
+    .no {
+        background-color: #777;
+    }
 </style>
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
 <body>
-<div>
-    <input type="hidden" id="email" value="test@test.com">
-    <input type="hidden" id="eventTimeId" value="1">
-    <button id="send">예매하기</button>
-    <br>
-</div>
+    <div>
+        <input type="hidden" id="email" value="test@test.com">
+        <input type="hidden" id="eventTimeId" value="10">
+        <button id="send">예매하기</button>
+        <br>
+    </div>
 
-<div id="number">
-    <span class="queue-title">내 대기번호</span> <br/>
-    <span id="queue-number"></span>
-</div>
+    <div id="number">
+        <span class="queue-title">내 대기번호</span> <br/>
+        <span id="queue-number"></span>
+    </div>
 
+    <div id="seatList">
+
+    </div>
 </body>
 <script>
-    const sendBtn = document.querySelector('#send');
-    sendBtn.addEventListener('click', (e) => {
-        let email = document.querySelector('#email').value;
-        let eventTimeId = document.querySelector('#eventTimeId').value;
+    document.addEventListener('DOMContentLoaded', () => {
+        const sendBtn = document.querySelector('#send');
+        sendBtn.addEventListener('click', (e) => {
+            let email = document.querySelector('#email').value;
+            let eventTimeId = document.querySelector('#eventTimeId').value;
 
-        const eventSource = new EventSource(`/api/v1/sse-connection?email=${email}&eventTimeId=${eventTimeId}`);
-        eventSource.onmessage = function (event) {
-            console.log(event.data);
-            if (event.data == "완료") {
-                document.querySelector("body").innerHTML = ``;
-                eventSource.onmessage = null;
-            }
-            document.querySelector('#queue-number').innerHTML = event.data;
-        };
-    });
+            const eventSource = new EventSource(`/api/v1/sse-connection?email=${email}&eventTimeId=${eventTimeId}`);
+            eventSource.onmessage = function (event) {
+                if (event.data.startsWith('[')) {
+                    document.querySelector("body div").style.display = "none";
+                    document.querySelector("#number").style.display = "none";
+
+                    let seatList = JSON.parse(event.data)
+                    eventSource.onmessage = null;
+                    document.querySelector("#seatList").style.display = "block"
+                    let i = 1;
+                    for (let seat of seatList) {
+                        if (seat.status === 'NONE') document.querySelector("#seatList").innerHTML += `<span class="num yes">` + i + `</span>`
+                        else document.querySelector("#seatList").innerHTML += `<span class="num no">`+ i  + `</span>`
+                        if ((i % 10) === 0) document.querySelector("#seatList").innerHTML += `<br>`
+                        i++;
+                    }
+                    return;
+                }
+                document.querySelector('#queue-number').innerHTML = event.data;
+            };
+        });
+    })
 </script>
 </html>

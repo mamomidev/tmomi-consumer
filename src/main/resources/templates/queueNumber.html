@@ -89,6 +89,7 @@
             console.log(event.data);
             if (event.data == "완료") {
                 document.querySelector("body").innerHTML = ``;
+                eventSource.onmessage = null;
             }
             document.querySelector('#queue-number').innerHTML = event.data;
         };

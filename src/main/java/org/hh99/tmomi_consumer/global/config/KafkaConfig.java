@@ -21,10 +21,6 @@ public class KafkaConfig {
 
 	@Value(value = "${spring.kafka.bootstrap-servers}")
 	private String bootstrapAddress;
-	@Value(value = "${aws.access-key}")
-	private String awsAccessKeyId;
-	@Value(value = "${aws.secret-access-key}")
-	private String awsSecretAccessKey;
 
 	@Bean
 	public ConsumerFactory<String, ReservationDto> consumerFactory() {
@@ -32,14 +28,6 @@ public class KafkaConfig {
 		config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
 		config.put(ConsumerConfig.GROUP_ID_CONFIG, "group_1");
 		config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-//
-//		System.setProperty("AWS_ACCESS_KEY_ID", awsAccessKeyId);
-//		System.setProperty("AWS_SECRET_ACCESS_KEY", awsSecretAccessKey);
-//
-//		config.put(AdminClientConfig.SECURITY_PROTOCOL_CONFIG, "SASL_SSL");
-//		config.put(SaslConfigs.SASL_MECHANISM, "AWS_MSK_IAM");
-//		config.put(SaslConfigs.SASL_JAAS_CONFIG,"software.amazon.msk.auth.iam.IAMLoginModule required;");
-//		config.put(SaslConfigs.SASL_CLIENT_CALLBACK_HANDLER_CLASS, "software.amazon.msk.auth.iam.IAMClientCallbackHandler");
 
 		JsonDeserializer<ReservationDto> deserializer = new JsonDeserializer<>(ReservationDto.class);
 		deserializer.addTrustedPackages("org.hh99.reservation.dto");

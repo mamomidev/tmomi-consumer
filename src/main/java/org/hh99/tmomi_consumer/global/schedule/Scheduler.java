@@ -5,14 +5,14 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hh99.reservation.dto.ReservationDto;
-import org.hh99.tmomi_consumer.global.util.ReservationQueue;
 import org.hh99.tmomi_consumer.emitter.Repository.EmitterRepository;
 import org.hh99.tmomi_consumer.emitter.service.EmitterService;
+import org.hh99.tmomi_consumer.global.util.ReservationQueue;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Component
 @RequiredArgsConstructor
@@ -21,6 +21,7 @@ public class Scheduler {
 	private final ReservationQueue reservationQueue;
 	private final EmitterService emitterService;
 	private final EmitterRepository emitterRepository;
+
 	@Scheduled(fixedRate = delay)
 	public void sendSeatList() {
 		// 입장처리할 사용자들
@@ -31,13 +32,16 @@ public class Scheduler {
 			reservationQueue.deleteQueue(reservationDto);
 		});
 	}
-	@Scheduled(fixedRate = 1000)
+
+	@Scheduled(fixedRate = delay)
 	public void sendQueueNum() {
 		Map<String, SseEmitter> sseEmitters = emitterRepository.findAllEmitters();
 		sseEmitters.forEach((key, emitter) -> {
-			ReservationDto reservationDto = new ReservationDto(key.split("_")[0], Long.parseLong(key.split("_")[1]));
-			long rank = reservationQueue.getRank(reservationDto) + 1;
-			if (rank > 50) {
+			Long getQueueSize = reservationQueue.getSize();
+			if (getQueueSize > 0) {
+				ReservationDto reservationDto = new ReservationDto(key.split("_")[0],
+					Long.parseLong(key.split("_")[1]));
+				long rank = reservationQueue.getRank(reservationDto) + 1;
 				emitterService.sendToClient(emitter, key, rank);
 			}
 		});

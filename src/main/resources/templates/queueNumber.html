@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div>
+    Email: <input type="text" id="email">
+    EventTimeId: <input type="text" id="eventTimeId">
+    <button id="send">요청</button>
+</div>
+</body>
+<script>
+    const sendBtn = document.querySelector('#send');
+
+    sendBtn.addEventListener('click', (e) => {
+        alert("test");
+        let email = document.querySelector('#email').value;
+        let eventTimeId = document.querySelector('#eventTimeId').value;
+
+        const eventSource = new EventSource(`/api/v1/sse-connection?email=${email}&eventTimeid=${eventTimeId}`);
+        eventSource.onmessage = function (event) {
+            console.log(event.data);
+        };
+    });
+
+</script>
+</html>

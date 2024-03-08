@@ -38,4 +38,8 @@ public class ReservationQueue {
 	public Long getRank(ReservationDto reservationDto) {
 		return redisTemplate.opsForZSet().rank(key, reservationDto);
 	}
+
+	public Long getSize() {
+		return redisTemplate.opsForZSet().size(key);
+	}
 }

@@ -8,8 +8,8 @@ import org.hh99.reservation.dto.ReservationDto;
 import org.hh99.tmomi.domain.reservation.Status;
 import org.hh99.tmomi.domain.reservation.document.ElasticSearchReservation;
 import org.hh99.tmomi.domain.reservation.respository.ElasticSearchReservationRepository;
-import org.hh99.tmomi_consumer.global.util.ReservationQueue;
 import org.hh99.tmomi_consumer.emitter.Repository.EmitterRepository;
+import org.hh99.tmomi_consumer.global.util.ReservationQueue;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -42,7 +42,7 @@ public class EmitterService {
 			}
 		);
 	}
-	
+
 	public void sendToClient(SseEmitter emitter, String emitterId, Object data) {
 		try {
 			emitter.send(SseEmitter.event()

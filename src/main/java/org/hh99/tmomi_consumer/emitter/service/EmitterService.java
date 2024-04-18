@@ -27,7 +27,7 @@ public class EmitterService {
 	public static final Long DEFAULT_TIMEOUT = -1L;
 
 	@KafkaListener(topics = "reservation", groupId = "group_1")
-	public void listen(ReservationDto reservationDto) {
+	public void processReservationMessage(ReservationDto reservationDto) {
 		reservationQueue.addQueue(reservationDto);
 	}
 
